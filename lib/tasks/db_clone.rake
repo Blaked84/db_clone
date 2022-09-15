@@ -25,6 +25,9 @@ namespace :db do
   task import_last_backup: :environment do
     Rake::Task['db:drop'].invoke
     Rake::Task['db:create'].invoke
+    ActiveRecord::Base.connection.execute <<-SQL
+       CREATE SCHEMA IF NOT EXISTS heroku_ext;
+    SQL
     system "pg_restore -O -x -d #{Rails.configuration.database_configuration[Rails.env]['database']} tmp/latest.dump"
     Rake::Task['db:migrate'].invoke
   end
