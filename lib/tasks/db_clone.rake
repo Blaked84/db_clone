@@ -1,4 +1,4 @@
-require 'active_record/connection_adapters/postgresql_adapter'
+require "active_record/connection_adapters/postgresql_adapter"
 module ActiveRecord
   module ConnectionAdapters
     class PostgreSQLAdapter < AbstractAdapter
@@ -23,19 +23,19 @@ end
 namespace :db do
   desc "Import the last production backup into local db"
   task import_last_backup: :environment do
-    Rake::Task['db:drop'].invoke
-    Rake::Task['db:create'].invoke
+    Rake::Task["db:drop"].invoke
+    Rake::Task["db:create"].invoke
     ActiveRecord::Base.connection.execute <<-SQL
        CREATE SCHEMA IF NOT EXISTS heroku_ext;
     SQL
     system "pg_restore -O -x -d #{Rails.configuration.database_configuration[Rails.env]['database']} tmp/latest.dump"
-    Rake::Task['db:migrate'].invoke
+    Rake::Task["db:migrate"].invoke
   end
 
   desc "Clone the production db into local db"
   task clone_prod: :environment do
-    system 'heroku pg:backups capture --remote heroku'
-    system 'curl -o tmp/latest.dump `heroku pg:backups --remote heroku public-url`'
-    Rake::Task['db:import_last_backup'].invoke
+    system "heroku pg:backups capture --remote heroku"
+    system "curl -o tmp/latest.dump `heroku pg:backups --remote heroku public-url`"
+    Rake::Task["db:import_last_backup"].invoke
   end
 end
