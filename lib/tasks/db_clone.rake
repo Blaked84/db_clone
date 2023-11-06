@@ -1,9 +1,12 @@
+# frozen_string_literal: true
+
 require "active_record/connection_adapters/postgresql_adapter"
 module ActiveRecord
   module ConnectionAdapters
     class PostgreSQLAdapter < AbstractAdapter
       def drop_database(name)
         raise "Nah, I won't drop the production database" if Rails.env.production?
+
         execute <<-SQL
           UPDATE pg_catalog.pg_database
           SET datallowconn=false WHERE datname='#{name}'
@@ -28,7 +31,7 @@ namespace :db do
     ActiveRecord::Base.connection.execute <<-SQL
        CREATE SCHEMA IF NOT EXISTS heroku_ext;
     SQL
-    system "pg_restore -O -x -d #{Rails.configuration.database_configuration[Rails.env]['database']} tmp/latest.dump"
+    system "pg_restore -O -x -d #{Rails.configuration.database_configuration[Rails.env]["database"]} tmp/latest.dump"
     Rake::Task["db:migrate"].invoke
   end
 
