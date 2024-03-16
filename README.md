@@ -20,7 +20,32 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+This gem provide 2 rake tasks to clone your heroku database to your local database.
+
+### `db:clone_prod`
+
+Create a new backup of your production database and download it to your local database.
+The backup will be saved in `tmp/latest.dump`.
+The backup is then automatically restored to your local database using `rake db:import_last_backup`.
+
+### `db:import_last_backup`
+Recreate your local database (development per default) and import the latest backup from `tmp/latest.dump`.
+It then run missing migrations
+
+### Options
+
+You can use the `PG_RESTORE_ARGS` environment variable to pass additional arguments to `pg_restore` when importing the backup.
+For example, you may want to use multiple threads to speed up the import:
+
+```bash
+PG_RESTORE_ARGS="-j4" rake db:import_last_backup
+```
+
+You can also make the output verbose :
+```bash
+PG_RESTORE_ARGS="--verbose" rake db:import_last_backup
+```
+
 
 ## Development
 

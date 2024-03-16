@@ -31,7 +31,10 @@ namespace :db do
     ActiveRecord::Base.connection.execute <<-SQL
        CREATE SCHEMA IF NOT EXISTS heroku_ext;
     SQL
-    system "pg_restore -O -x -d #{Rails.configuration.database_configuration[Rails.env]["database"]} tmp/latest.dump"
+
+    puts "Restoring database ..."
+    extra_args = ENV.fetch('PG_RESTORE_ARGS', '')
+    system "pg_restore -O -x -d #{Rails.configuration.database_configuration[Rails.env]["database"]} #{extra_args} tmp/latest.dump"
     Rake::Task["db:migrate"].invoke
   end
 
